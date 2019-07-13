@@ -1,6 +1,6 @@
 title: this is title
 columns: 
-  "{
+  "[{
       title: '规则名称',
       dataIndex: 'name',
       render: text => `${text}`,
@@ -14,7 +14,6 @@ columns:
       dataIndex: 'callNo',
       sorter: true,
       render: val => `${val} 万`,
-      // mark to display a total number
       needTotal: true,
     },
     {

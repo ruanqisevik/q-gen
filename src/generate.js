@@ -29,9 +29,9 @@ async function generate(template, output, options) {
 			const exist = await isFileExists(configFile)
 			const extname = exist && path.extname(configFile)
 			if (extname === '.json') {
-
+				config = JSON.parse(fs.readFileSync(configFile, 'utf8'))
 			} else if (extname === '.js') {
-
+				config = require(path.resolve(configFile))
 			} else if (extname === '.yml') {
 				config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'))
 			}
@@ -46,15 +46,17 @@ async function generate(template, output, options) {
 		const outputPath = await outputDir(output)
 		const loadedTemplates = await load(templatePath)
 
-		const processFlag = await Promise.all(loadedTemplates.map(async ({
-			buffer,
-			fileName
-		}) => {
-			log.debug('processing', fileName)
-			const source = await buffer
-			const outputContent = transform(source, config)
-			return await writeFileTo(path.join(outputPath, fileName), outputContent)
-		}))
+		const processFlag = await Promise.all(
+			loadedTemplates.map(async ({
+				buffer,
+				fileName
+			}) => {
+				log.debug('processing', fileName)
+				const source = await buffer
+				const outputContent = transform(source, config)
+				return await writeFileTo(path.join(outputPath, fileName), outputContent)
+			})
+		)
 		if (processFlag.includes(false)) return new Error('some file process failed')
 	} catch (error) {
 		throw error
@@ -113,7 +115,5 @@ async function defaultTemplateDir(template) {
 		throw new Error(`no such built-in template called '${template}'`)
 	}
 }
-
-
 
 module.exports = generate

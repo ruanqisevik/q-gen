@@ -1,0 +1,4 @@
+{
+  "title": "this is title",
+  "columns": "[{ title: '规则名称', dataIndex: 'name', render: text => `${text}` }]"
+}
