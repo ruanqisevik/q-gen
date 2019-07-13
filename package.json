@@ -14,7 +14,8 @@
     "handlebars": "^4.1.2",
     "js-yaml": "^3.13.1",
     "param-case": "^2.1.1",
-    "pino": "^5.12.6"
+    "pino": "^5.12.6",
+    "lodash": ">=4.17.13"
   },
   "bin": {
     "adgen": "./bin/index.js"
