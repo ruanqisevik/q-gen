@@ -1,7 +1,7 @@
 const pino = require('pino')
 
 module.exports = pino({
-	level: 'silent',
+	level: 'warn',
 	base: null,
-	timestamp: false
+	timestamp: false,
 })

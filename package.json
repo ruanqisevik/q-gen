@@ -9,13 +9,19 @@
   "author": "Q.Roy",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.19.0",
     "camelcase": "^5.3.1",
     "caporal": "^1.2.0",
+    "ejs": "^2.6.2",
+    "ejs-lint": "^0.3.0",
+    "got": "^9.6.0",
     "handlebars": "^4.1.2",
+    "inquirer": "^6.5.0",
     "js-yaml": "^3.13.1",
+    "lodash": ">=4.17.13",
+    "mustache": "^3.0.1",
     "param-case": "^2.1.1",
-    "pino": "^5.12.6",
-    "lodash": ">=4.17.13"
+    "pino": "^5.12.6"
   },
   "bin": {
     "adgen": "./bin/index.js"

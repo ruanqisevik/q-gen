@@ -1,8 +1,5 @@
 const fs = require('fs')
 const path = require('path')
-const {
-	promisify
-} = require('util')
 
 const camelCase = require('camelcase')
 const yaml = require('js-yaml')
@@ -10,14 +7,10 @@ const yaml = require('js-yaml')
 const log = require('../logger')
 const load = require('./loader')
 const list = require('./list')
+const swaggerParsed = require('./swaggerParser')
 const transform = require('./transform')
-const {
-	isDirExists,
-	isFileExists
-} = require('./util')
-const {
-	TEMPLATE_PATH
-} = require('./globals')
+const { safeDir, safeFile, writeFileTo, isDirExists, isFileExists } = require('./util')
+const { TEMPLATE_PATH } = require('./globals')
 
 async function generate(template, output, options) {
 	try {
@@ -36,21 +29,29 @@ async function generate(template, output, options) {
 				config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'))
 			}
 		}
+		if (options.swagger) {
+			config.requestUrl = options.requestUrl
+			const swaggerPath = path.resolve(options.swagger)
+			const swagger =
+				(await isFileExists(swaggerPath)) && JSON.parse(fs.readFileSync(swaggerPath, 'utf8'))
+			if (swagger.paths[config.requestUrl]) {
+				config = swaggerParsed(swagger, config)
+			} else {
+				throw new Error('swagger has no such request path')
+			}
+		}
 
 		if (options.file) {
-			templatePath = await templateFile(template)
+			templatePath = await safeFile(template)
 		} else {
 			templatePath = await templateDir(template)
 		}
 
-		const outputPath = await outputDir(output)
+		const outputPath = await safeDir(output)
 		const loadedTemplates = await load(templatePath)
 
 		const processFlag = await Promise.all(
-			loadedTemplates.map(async ({
-				buffer,
-				fileName
-			}) => {
+			loadedTemplates.map(async ({ buffer, fileName }) => {
 				log.debug('processing', fileName)
 				const source = await buffer
 				const outputContent = transform(source, config)
@@ -63,47 +64,12 @@ async function generate(template, output, options) {
 	}
 }
 
-async function writeFileTo(path, content) {
-	try {
-		const err = await promisify(fs.writeFile)(path, content)
-		if (err) {
-			throw err
-		} else {
-			return true
-		}
-	} catch (error) {
-		throw error
-	}
-}
-
-async function templateFile(template) {
-	try {
-		const exists = await isFileExists(template)
-		if (exists) {
-			return path.resolve(template)
-		} else {
-			throw new Error('judge file failed')
-		}
-	} catch (error) {
-		throw error
-	}
-}
-
 async function templateDir(template) {
 	const exists = await isDirExists(template)
 	if (exists) {
 		return path.resolve(template)
 	} else {
 		return await defaultTemplateDir(camelCase(template))
-	}
-}
-
-async function outputDir(output) {
-	const exists = await isDirExists(output)
-	if (exists) {
-		return path.resolve(output)
-	} else {
-		throw new Error(`no such output path called '${output}'`)
 	}
 }
 
