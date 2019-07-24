@@ -1,5 +1,5 @@
 {
-  "name": "ad-gen",
+  "name": "ad-generator",
   "version": "1.0.0",
   "description": "admin generator",
   "main": "index.js",
