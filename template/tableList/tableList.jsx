@@ -39,7 +39,9 @@ const getValue = obj =>
 
 /* eslint react/no-multi-comp:0 */
 @connect(({ {{#each modules}}{{this}}, {{/each}}loading }) => ({
-  {{#each modules}}{{this}},{{/each}}
+  {{#each modules}}
+  {{this}},
+  {{/each}}
   loading: {{#each modules}}{{#if @index}} && {{/if}}loading.models.{{this}}{{/each}}
 }))
 @Form.create()
@@ -67,10 +69,13 @@ class {{class}} extends PureComponent {
    */
   fetchList = options => {
     const { dispatch } = this.props;
+
+    {{#each modules}}
     dispatch({
-      type: 'request/{{module}}',
+      type: 'request/{{this}}',
       payload: options,
     });
+    {{/each}}
   };
 
   /**
@@ -159,17 +164,41 @@ class {{class}} extends PureComponent {
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{{{raw}}}}{{ md: 8, lg: 24, xl: 48 }}{{{{/raw}}}}>
-          
+        <Row gutter=\{{ md: 8, lg: 24, xl: 48 }}>
+          {{#each form}}
+          {{#if @index}}
+          {{else}}
+          <Col md={8} sm={24}>
+            <FormItem label="{{label this}}">
+              {getFieldDecorator('{{key this}}')(   
+                {{#if format}}
+                <DatePicker style=\{{ width: '100%' }} {{#isTime format}}showTime=\{{ format: 'HH:mm' }}{{/isTime}} placeholder="请输入更新日期" /> 
+                {{else}}
+                {{#if enum}}
+                <Select placeholder="请选择" style=\{{ width: '100%' }}>
+                  {{#each enum}}
+                  <Option value="{{this}}">{{this}}</Option>
+                  {{/each}}
+                </Select>
+                {{else}}
+                <Input placeholder="请输入" />
+                {{/if}}
+                {{/if}}
+              )}
+            </FormItem>
+          </Col>
+          {{/if}}
+          {{/each}}
+
           <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
               </Button>
-              <Button style={{{{raw}}}}{{ marginLeft: 8 }}{{{{/raw}}}} onClick={this.handleFormReset}>
+              <Button style=\{{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{{{raw}}}}{{ marginLeft: 8 }}{{{{/raw}}}} onClick={this.toggleForm}>
+            <a style=\{{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
             </span>
@@ -185,66 +214,42 @@ class {{class}} extends PureComponent {
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{{{raw}}}}{{ md: 8, lg: 24, xl: 48 }}{{{{/raw}}}}>
+        <Row gutter=\{{ md: 8, lg: 24, xl: 48 }}>
+        {{#each form}}
           <Col md={8} sm={24}>
-            <FormItem label="规则名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{{{raw}}}}{{ width: '100%' }}{{{{/raw}}}}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
+            <FormItem label="{{label this}}">
+              {getFieldDecorator('{{key this}}')(   
+                {{#if format}}
+                <DatePicker style=\{{ width: '100%' }} {{#isTime format}}showTime=\{{ format: 'HH:mm' }}{{/isTime}} placeholder="请输入更新日期" /> 
+                {{else}}
+                {{#if enum}}
+                <Select placeholder="请选择" style=\{{ width: '100%' }}>
+                  {{#each enum}}
+                  <Option value="{{this}}">{{this}}</Option>
+                  {{/each}}
                 </Select>
+                {{else}}
+                <Input placeholder="请输入" />
+                {{/if}}
+                {{/if}}
               )}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="调用次数">
-              {getFieldDecorator('number')(<InputNumber style={{{{raw}}}}{{ width: '100%' }}{{{{/raw}}}} />)}
-            </FormItem>
-          </Col>
+        {{#wrapRow @index}}
         </Row>
-        <Row gutter={{{{raw}}}}{{ md: 8, lg: 24, xl: 48 }}{{{{/raw}}}}>
-          <Col md={8} sm={24}>
-            <FormItem label="更新日期">
-              {getFieldDecorator('date')(
-                <DatePicker style={{{{raw}}}}{{ width: '100%' }}{{{{/raw}}}} placeholder="请输入更新日期" />
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status3')(
-                <Select placeholder="请选择" style={{{{raw}}}}{{ width: '100%' }}{{{{/raw}}}}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status4')(
-                <Select placeholder="请选择" style={{{{raw}}}}{{ width: '100%' }}{{{{/raw}}}}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>
-              )}
-            </FormItem>
-          </Col>
+        <Row gutter=\{{ md: 8, lg: 24, xl: 48 }}>
+        {{/wrapRow}} 
+        {{/each}}
         </Row>
-        <div style={{{{raw}}}}{{ overflow: 'hidden' }}{{{{/raw}}}}>
-          <div style={{{{raw}}}}{{ float: 'right', marginBottom: 24 }}{{{{/raw}}}}>
+        <div style=\{{ overflow: 'hidden' }}>
+          <div style=\{{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
               查询
             </Button>
-            <Button style={{{{raw}}}}{{ marginLeft: 8 }}{{{{/raw}}}} onClick={this.handleFormReset}>
+            <Button style=\{{ marginLeft: 8 }} onClick={this.handleFormReset}>
               重置
             </Button>
-            <a style={{{{raw}}}}{{ marginLeft: 8 }}{{{{/raw}}}} onClick={this.toggleForm}>
+            <a style=\{{ marginLeft: 8 }} onClick={this.toggleForm}>
               收起 <Icon type="up" />
             </a>
           </div>
@@ -263,9 +268,20 @@ class {{class}} extends PureComponent {
    */
   render() {
     const {
-      rule: { data },
+      {{#each modules}}
+      {{this}},
+      {{/each}}
       loading,
     } = this.props;
+    /**
+    * process list data from request modules response
+    */
+    {{#isSingleModule modules}}
+    const { data } = {{this}}
+    {{else}}
+    const data = []
+    {{/isSingleModule}}
+    
     const { selectedRows } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>

@@ -1,10 +1,9 @@
 import { 
-{{#each requests}}
-{{functionName}}, 
-{{/each}} } from '@/services/{{module}}'
+insertAdminGoodsCategory, 
+ } from '@/services/adminGoodsCategory'
 
 export default {
-	namespace: '{{module}}',
+	namespace: 'adminGoodsCategory',
 
 	state: {
 		data: {
@@ -14,15 +13,13 @@ export default {
 	},
 
 	effects: {
-    {{#each requests}}
-		*{{action}}({ payload }, { call, put }) {
-			const response = yield call({{functionName}}, payload)
+		*insert({ payload }, { call, put }) {
+			const response = yield call(insertAdminGoodsCategory, payload)
 			yield put({
 				type: 'save',
 				payload: response,
 			})
 		},
-    {{/each}}
 	},
 
 	reducers: {

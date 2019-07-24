@@ -16,14 +16,17 @@ async function load(templatePath) {
 					const fileNames = await promisify(fs.readdir)(templatePath)
 					return fileNames.map(fileName => path.join(templatePath, fileName))
 				  })()
-
-		const buffers = files.map(file => {
-			return {
-				buffer: promisify(fs.readFile)(file, 'utf8'),
-				file: file,
-				fileName: path.basename(file),
-			}
-		})
+		const buffers = files
+			.filter(file => {
+				return path.basename(file) !== '.DS_Store' && path.basename(file, '.js') !== 'helpers'
+			})
+			.map(file => {
+				return {
+					buffer: promisify(fs.readFile)(file, 'utf8'),
+					file: file,
+					fileName: path.basename(file),
+				}
+			})
 		return buffers
 	} catch (error) {
 		throw error

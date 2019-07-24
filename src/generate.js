@@ -35,7 +35,7 @@ async function generate(template, output, options) {
 			const swagger =
 				(await isFileExists(swaggerPath)) && JSON.parse(fs.readFileSync(swaggerPath, 'utf8'))
 			if (swagger.paths[config.requestUrl]) {
-				config = swaggerParsed(swagger, config)
+				config = await swaggerParsed(swagger, config)
 			} else {
 				throw new Error('swagger has no such request path')
 			}
@@ -49,12 +49,14 @@ async function generate(template, output, options) {
 
 		const outputPath = await safeDir(output)
 		const loadedTemplates = await load(templatePath)
+		const helpersPath = path.join(templatePath, 'helpers.js')
+		const helpers = ((await isFileExists(helpersPath)) && require(helpersPath)) || {}
 
 		const processFlag = await Promise.all(
 			loadedTemplates.map(async ({ buffer, fileName }) => {
 				log.debug('processing', fileName)
 				const source = await buffer
-				const outputContent = transform(source, config)
+				const outputContent = transform(source, config, helpers)
 				return await writeFileTo(path.join(outputPath, fileName), outputContent)
 			})
 		)

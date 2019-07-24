@@ -30,10 +30,24 @@ prog
 					{
 						type: 'input',
 						name: 'requestUrl',
-						message: 'Please input your request url',
+						message: '请输入该页面的请求地址(path)',
+						default: false,
+					},
+					{
+						type: 'confirm',
+						name: 'needApi',
+						message: '是否需要生成相应的 Api 模块',
 						default: false,
 					},
 				])
+				if (answers.needApi) {
+					const pieces = answers.requestUrl.split('/')
+					pieces.pop()
+					pieces.shift()
+					const moduleName = pieces.join('/')
+					generateApi(options.swagger, outputDir, [moduleName])
+				}
+
 				options = {
 					...options,
 					...answers,

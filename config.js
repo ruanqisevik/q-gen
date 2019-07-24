@@ -1,6 +1,6 @@
 module.exports = {
 	class: 'TableList',
-	modules: ['address', 'projects'],
+	modules: ['address'],
 	addable: true,
 	batch: false,
 	title: 'table list title',

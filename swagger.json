@@ -1326,7 +1326,8 @@
             "in": "query",
             "description": "状态(1有效，0删除)",
             "required": false,
-            "type": "ref"
+            "type": "ref",
+            "enum": [0, 1]
           },
           {
             "name": "createTime",
@@ -1334,7 +1335,7 @@
             "description": "记录创建时间",
             "required": true,
             "type": "string",
-            "format": "date"
+            "format": "date-time"
           },
           {
             "name": "createById",

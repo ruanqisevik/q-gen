@@ -1,5 +1,6 @@
 const path = require('path')
 const camelCase = require('camelcase')
+const getModuleName = require('./moduleHelper')
 
 module.exports = async (swagger, config) => {
 	if (config.requestUrl) {
@@ -48,9 +49,32 @@ module.exports = async (swagger, config) => {
 		request.headers = headers
 		request.params = params
 		request.body = body
-		// console.log(JSON.parse(params + body))
-		config.form = params + body
+		const form = params.concat(body)
+		const overrideColumns = form
+			.filter(item => {
+				let name = item.name
+				return ['pageNum', 'pageSize', 'deleted'].indexOf(name) === -1
+			})
+			.map(item => {
+				const column = {
+					title: item.description,
+					dataIndex: item.name,
+				}
+				if (item.enum) {
+					column.filters = item.enum.map(item => {
+						return {
+							text: item,
+							value: item,
+						}
+					})
+				}
+				return column
+			})
+		config.columns = JSON.stringify(overrideColumns)
+		config.form = form
 		config.request = request
+
+		config.modules = [getModuleName(config.requestUrl)]
 	}
 	return config
 }

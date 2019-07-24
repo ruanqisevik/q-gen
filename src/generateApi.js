@@ -7,6 +7,7 @@ const logger = require('caporal').logger()
 const log = require('../logger')
 const load = require('./loader')
 const transform = require('./transform')
+const getModuleName = require('./moduleHelper')
 const { TEMPLATE_PATH } = require('./globals')
 
 const { safeFile, safeDir, writeFileTo, isDirExists } = require('./util')
@@ -19,8 +20,13 @@ const generate = async (swaggerJsonPath, outputDir, modules) => {
 		const modulesMapToGen = {}
 		modules.forEach(moduleName => {
 			const modulePaths = Object.keys(swagger.paths).filter(key => {
-				return key.indexOf(moduleName) !== -1
+				let exits = key.indexOf(moduleName) !== -1
+				if (exits) {
+					moduleName = getModuleName(key)
+				}
+				return exits
 			})
+
 			if (modulePaths.length > 0) {
 				modulesMapToGen[moduleName] = modulePaths.map(modulePath => {
 					const map = {}
@@ -37,9 +43,11 @@ const generate = async (swaggerJsonPath, outputDir, modules) => {
 			const modulePaths = moduleMap[1]
 			const config = createConfig(moduleName, modulePaths)
 			const pendingBuffers = await load(path.join(TEMPLATE_PATH, '/api'))
+
 			const processFlag = await Promise.all(
 				pendingBuffers.map(async ({ buffer, fileName }) => {
 					const outputPath = path.join(output, fileName)
+
 					if (index === 0) {
 						!(await isDirExists(outputPath)) && (await promisify(fs.mkdir)(outputPath))
 					}
