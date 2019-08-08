@@ -6,7 +6,7 @@ const debug = require('../logger')
 const questions = require('./questions')
 const { generate, generateUmi } = require('../generate')
 const { isFileExists } = require('../utils').file
-const version = require('./package.json').version
+const version = require('../package.json').version
 
 // general generate command
 prog
