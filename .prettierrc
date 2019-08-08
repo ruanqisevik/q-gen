@@ -3,6 +3,7 @@
   "trailingComma": "es5",
   "printWidth": 100,
   "proseWrap": "never",
+  "quoteProps": "consistent",
   "overrides": [{
     "files": ".prettierrc",
     "options": {

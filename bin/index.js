@@ -1,97 +1,71 @@
 #!/usr/bin/env node
 
+const path = require('path')
 const prog = require('caporal')
-const inquirer = require('inquirer')
-
-const log = require('../logger')
-const list = require('../src/list')
-const generate = require('../src/generate')
-const generateApi = require('../src/generateApi')
-
+const debug = require('../logger')
+const questions = require('./questions')
+const { generate, generateUmi } = require('../generate')
+const { isFileExists } = require('../utils').file
+// general generate command
 prog
 	.version('0.0.1')
-	.command('generate', 'Generate Template File; 从模板文件生成代码')
+	.command('generate')
 	.alias('g')
-	.argument(
-		'<templateDir>',
-		'指定模板目录或采用内置模板, 使用 list 命令查看内置模板; 在 --file 模式下为指定模板文件路径'
-	)
-	.argument('<outputDir>', '指定生成后代码的输出目录')
-	.option('--config <configFile>', '指定模板生成代码时使用的配置文件')
-	.option('--file', '从单个模板文件生成代码')
-	.option('--swagger <swaggerJsonPath>', '从 swagger.json 文件指定模块默认的请求信息')
+	.option('-t --template <template>', '指定模板文件或目录')
+	.option('-c --config <configFile>', '指定配置文件')
+	.option('-o --output <outputPath>', '指定输出路径')
 	.action(async function(args, options, logger) {
-		const templateDir = args.templateDir || logger.error('请传入正确的模板参数')
-		const outputDir = args.outputDir || logger.error('请传入正确的模板参数')
-		var answers = []
-		try {
-			if (options.swagger) {
-				answers = await inquirer.prompt([
-					{
-						type: 'input',
-						name: 'requestUrl',
-						message: '请输入该页面的请求地址(path)',
-						default: false,
-					},
-					{
-						type: 'confirm',
-						name: 'needApi',
-						message: '是否需要生成相应的 Api 模块',
-						default: false,
-					},
-				])
-				if (answers.needApi) {
-					const pieces = answers.requestUrl.split('/')
-					pieces.pop()
-					pieces.shift()
-					const moduleName = pieces.join('/')
-					generateApi(options.swagger, outputDir, [moduleName])
-				}
-
-				options = {
-					...options,
-					...answers,
-				}
-			}
-			const err = await generate(templateDir, outputDir, options)
-			if (err) {
-				throw err
-			} else {
-				logger.info('generate complete!')
-			}
-		} catch (error) {
-			log.debug(error)
-			logger.error(error.message)
+		const templatePath = options.template
+		const configFile = options.config
+		const outputPath = options.output
+		if (templatePath) {
+			generate(templatePath, configFile, outputPath)
+		} else {
+			const answers = await questions.askQuestions()
+			debug.info(answers)
+			const templateDir = getTemplatePath(answers)
+			generate(templateDir, configFile, outputPath, answers)
 		}
 	})
 
-	.command('list', 'List All built-in templates; 列出所有内置模板')
-	.action(function(args, options, logger) {
-		list()
-			.then(result => {
-				logger.info(result)
-			})
-			.catch(err => {
-				throw err
-			})
-	})
-
-	.command('api', 'Generate Api files; 从 swagger.json 生成接口代码')
-	.argument('<swaggerJsonPath>', '指定 swagger.json 的文件路径')
-	.argument('<outputDir>', '指定生成后代码的输出目录')
-	.argument('[modules...]', '指定需要生成的模块, 不传入此参数则生成所有模块')
-	.action(function(args, options, logger) {
-		const swaggerJsonPath =
-			args.swaggerJsonPath || logger.error('请传入正确的 swagger.json 文件路径')
-		const outputDir = args.outputDir || logger.error('请传入正确的输出目录')
-		const modules = args.modules || logger.error('请传入正确的模块参数')
-
-		try {
-			generateApi(swaggerJsonPath, outputDir, modules)
-		} catch (error) {
-			log.debug(error)
-			logger.error(error.message)
-		}
+	// umi generate command
+	.command('umi')
+	.option('-c --config <configFile>', '指定配置文件')
+	.option('-o --output <outputPath>', '指定输出路径')
+	.option('-s --swagger <swaggerFile>', '指定本地 swagger 文件')
+	.option('-m --modules <moduleNames>', '指定需要输出的 swagger 模块, 使用 "," 进行连接')
+	.action(async function(args, options, logger) {
+		const configFile = options.config
+		const outputPath = options.output
+		const swagger = options.swagger
+		const moduleNames = options.modules
+		const isValidSwaggerFile = await isFileExists(swagger)
+		console.log(isValidSwaggerFile)
+		const initialAnswer = Object.assign(
+			{
+				builtIn: 'umi',
+			},
+			isValidSwaggerFile ? { swagger: path.resolve(swagger) } : {},
+			moduleNames ? { moduleNames: moduleNames.split(',') } : {}
+		)
+		const answers = await questions.askQuestions('umi-start', initialAnswer)
+		const templateDir = getTemplatePath(answers)
+		await generateUmi(templateDir, configFile, outputPath, answers)
 	})
 
 prog.parse(process.argv)
+
+const getTemplatePath = answers => {
+	if ('builtIn' in answers) {
+		const builtIn = answers.builtIn
+		const moduleName = answers[answers.builtIn]
+		const templateDir = path.join(path.join(__dirname, '../templates'), builtIn, moduleName)
+		return templateDir
+	} else if ('repository' in answers) {
+		return answers.tempDir
+	} else if ('remoteFile' in answers) {
+		return answers.tempFile
+	} else {
+		return ''
+	}
+}

@@ -3,28 +3,20 @@ const path = require('path')
 const { promisify } = require('util')
 
 async function safeDir(dir) {
-	try {
-		const exists = await isDirExists(dir)
-		if (exists) {
-			return path.resolve(dir)
-		} else {
-			throw new Error(`no such dir called '${dir}'`)
-		}
-	} catch (error) {
-		throw error
+	const exists = await isDirExists(dir)
+	if (exists) {
+		return path.resolve(dir)
+	} else {
+		throw new Error(`no such dir called '${dir}'`)
 	}
 }
 
 async function safeFile(file) {
-	try {
-		const exists = await isFileExists(file)
-		if (exists) {
-			return path.resolve(file)
-		} else {
-			throw new Error(`no such file called '${file}'`)
-		}
-	} catch (error) {
-		throw error
+	const exists = await isFileExists(file)
+	if (exists) {
+		return path.resolve(file)
+	} else {
+		throw new Error(`no such file called '${file}'`)
 	}
 }
 
@@ -42,37 +34,35 @@ async function isFileExists(file) {
 		const stats = await promisify(fs.stat)(file)
 		return stats.isFile(file)
 	} catch (err) {
-		throw false
+		return false
 	}
 }
 
 async function fsTypeOf(param) {
-	try {
-		const stats = await promisify(fs.stat)(param)
-		if (stats.isFile(param)) {
-			return 'file'
-		} else if (stats.isDirectory(param)) {
-			return 'directory'
-		} else if (stats.isSymbolicLink) {
-			return 'link'
-		} else {
-			return 'unknown'
-		}
-	} catch (err) {
-		throw err
+	const stats = await promisify(fs.stat)(param)
+	if (stats.isFile(param)) {
+		return 'file'
+	} else if (stats.isDirectory(param)) {
+		return 'directory'
+	} else if (stats.isSymbolicLink) {
+		return 'link'
+	} else {
+		return 'unknown'
 	}
 }
 
 async function writeFileTo(output, content) {
+	!(await isDirExists(path.dirname(output))) &&
+		(await promisify(fs.mkdir)(path.dirname(output), { recursive: true }))
 	try {
 		const err = await promisify(fs.writeFile)(output, content)
 		if (err) {
-			throw err
+			return false
 		} else {
 			return true
 		}
 	} catch (error) {
-		throw error
+		return false
 	}
 }
 

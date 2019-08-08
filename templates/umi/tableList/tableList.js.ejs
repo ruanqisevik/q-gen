@@ -25,7 +25,7 @@ import {
 import StandardTable from '@/components/StandardTable';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
-import styles from './{{class}}.less';
+import styles from './<%- className %>.less';
 
 const FormItem = Form.Item;
 const { Step } = Steps;
@@ -38,15 +38,14 @@ const getValue = obj =>
     .join(',');
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ {{#each modules}}{{this}}, {{/each}}loading }) => ({
-  {{#each modules}}
-  {{this}},
-  {{/each}}
-  loading: {{#each modules}}{{#if @index}} && {{/if}}loading.models.{{this}}{{/each}}
+
+@connect(({ <%- moduleName %>, loading }) => ({
+  <%- moduleName %>,
+  loading: loading.models.<%- moduleName %>
 }))
 @Form.create()
 
-class {{class}} extends PureComponent {
+class <%- className %> extends PureComponent {
   /**
    * definition
    */
@@ -55,7 +54,7 @@ class {{class}} extends PureComponent {
     selectedRows: [],
   };
 
-  columns = {{{columns}}}
+  columns = <%- columns %>
 
   /**
    * life cycle
@@ -70,12 +69,10 @@ class {{class}} extends PureComponent {
   fetchList = options => {
     const { dispatch } = this.props;
 
-    {{#each modules}}
     dispatch({
-      type: 'request/{{this}}',
+      type: '<%- moduleName %>/<%- action %>',
       payload: options,
     });
-    {{/each}}
   };
 
   /**
@@ -139,24 +136,20 @@ class {{class}} extends PureComponent {
 
   handleSearch = e => {
     e.preventDefault();
-
     const { form } = this.props;
-
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-
       const values = {
         ...fieldsValue,
         updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
       };
-
       this.setState({
         formValues: values,
       });
-
       this.fetchList(values)
     });
   };
+
 
   renderSimpleForm() {
     const {
@@ -164,41 +157,40 @@ class {{class}} extends PureComponent {
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter=\{{ md: 8, lg: 24, xl: 48 }}>
-          {{#each form}}
-          {{#if @index}}
-          {{else}}
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+          <%_ form.forEach((element, index) => { _%>
+          <%_ if (index !== 0) { _%>
           <Col md={8} sm={24}>
-            <FormItem label="{{label this}}">
-              {getFieldDecorator('{{key this}}')(   
-                {{#if format}}
-                <DatePicker style=\{{ width: '100%' }} {{#isTime format}}showTime=\{{ format: 'HH:mm' }}{{/isTime}} placeholder="请输入更新日期" /> 
-                {{else}}
-                {{#if enum}}
-                <Select placeholder="请选择" style=\{{ width: '100%' }}>
-                  {{#each enum}}
-                  <Option value="{{this}}">{{this}}</Option>
-                  {{/each}}
+            <FormItem label="<%- element.description %>">
+              {getFieldDecorator('<%- element.name %>')(   
+                <%_ if (element.format) { _%>
+                <DatePicker style={{ width: '100%' }} <%_ if (element.format === 'date-time') { _%>showTime={{ format: 'HH:mm' }}<%_ } _%> placeholder="请输入更新日期" /> 
+                <%_ } else { _%>
+                <%_ if (element.enum) { _%>
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <%_ element.enum.forEach(enumItem => { _%>
+                  <Option value="<%- enumItem %>"><%- enumItem %></Option>
+                  <%_ }) _%>
                 </Select>
-                {{else}}
+                <%_ } else { _%>
                 <Input placeholder="请输入" />
-                {{/if}}
-                {{/if}}
+                <%_ } _%>
+                <%_ } _%>
               )}
             </FormItem>
           </Col>
-          {{/if}}
-          {{/each}}
+          <%_ } _%>
+          <%_ }) _%>
 
           <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
               </Button>
-              <Button style=\{{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-            <a style=\{{ marginLeft: 8 }} onClick={this.toggleForm}>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
                 展开 <Icon type="down" />
               </a>
             </span>
@@ -207,49 +199,49 @@ class {{class}} extends PureComponent {
       </Form>
     );
   }
-
+ 
   renderAdvancedForm() {
     const {
       form: { getFieldDecorator },
     } = this.props;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter=\{{ md: 8, lg: 24, xl: 48 }}>
-        {{#each form}}
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+        <%_ form.forEach((element, index) => { _%>
           <Col md={8} sm={24}>
-            <FormItem label="{{label this}}">
-              {getFieldDecorator('{{key this}}')(   
-                {{#if format}}
-                <DatePicker style=\{{ width: '100%' }} {{#isTime format}}showTime=\{{ format: 'HH:mm' }}{{/isTime}} placeholder="请输入更新日期" /> 
-                {{else}}
-                {{#if enum}}
-                <Select placeholder="请选择" style=\{{ width: '100%' }}>
-                  {{#each enum}}
-                  <Option value="{{this}}">{{this}}</Option>
-                  {{/each}}
+            <FormItem label="<%- element.description %>">
+              {getFieldDecorator('<%- element.name %>')(   
+                <%_ if (element.format) { _%>
+                <DatePicker style={{ width: '100%' }} <%_ if (element.format === 'date-time') { _%>showTime={{ format: 'HH:mm' }}<%_ } _%> placeholder="请输入更新日期" /> 
+                <%_ } else { _%>
+                <%_ if (element.enum) { _%>
+                <Select placeholder="请选择" style={{ width: '100%' }}>
+                  <%_ element.enum.forEach(enumItem => { _%>
+                  <Option value="<%- enumItem %>"><%- enumItem %></Option>
+                  <%_ }) _%>
                 </Select>
-                {{else}}
+                <%_ } else { _%>
                 <Input placeholder="请输入" />
-                {{/if}}
-                {{/if}}
+                <%_ } _%>
+                <%_ } _%>
               )}
             </FormItem>
           </Col>
-        {{#wrapRow @index}}
+        <%_ if (index % 3 === 2) { _%>
         </Row>
-        <Row gutter=\{{ md: 8, lg: 24, xl: 48 }}>
-        {{/wrapRow}} 
-        {{/each}}
+        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
+        <%_ } _%>
+        <%_ }) _%>
         </Row>
-        <div style=\{{ overflow: 'hidden' }}>
-          <div style=\{{ float: 'right', marginBottom: 24 }}>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{ float: 'right', marginBottom: 24 }}>
             <Button type="primary" htmlType="submit">
               查询
             </Button>
-            <Button style=\{{ marginLeft: 8 }} onClick={this.handleFormReset}>
+            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
               重置
             </Button>
-            <a style=\{{ marginLeft: 8 }} onClick={this.toggleForm}>
+            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
               收起 <Icon type="up" />
             </a>
           </div>
@@ -268,19 +260,12 @@ class {{class}} extends PureComponent {
    */
   render() {
     const {
-      {{#each modules}}
-      {{this}},
-      {{/each}}
+      <%- moduleName %>: { data },
       loading,
     } = this.props;
     /**
     * process list data from request modules response
     */
-    {{#isSingleModule modules}}
-    const { data } = {{this}}
-    {{else}}
-    const data = []
-    {{/isSingleModule}}
     
     const { selectedRows } = this.state;
     const menu = (
@@ -296,12 +281,9 @@ class {{class}} extends PureComponent {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              {{#if addable}}
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
               </Button>
-              {{/if}}
-              {{#if batch}}
               {selectedRows.length > 0 && (
                 <span>
                   <Dropdown overlay={menu}>
@@ -311,7 +293,6 @@ class {{class}} extends PureComponent {
                   </Dropdown>
                 </span>
               )}
-              {{/if}}
             </div>
             <StandardTable
               selectedRows={selectedRows}
@@ -329,4 +310,5 @@ class {{class}} extends PureComponent {
   }
 }
 
-export default {{class}};
+export default <%- className %>;
+ 

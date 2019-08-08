@@ -1,20 +1,14 @@
-<h1 align="center">Welcome to admin-generator 👋</h1>
+<h1 align="center">Welcome to @q.roy/q-gen 👋</h1>
 <p>
-  <img src="https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000" />
 </p>
 
-> admin-generator is a tool for generating code skeleton for admin project; Using specify template file or built-in tempalte and complile with handlebars;
+> A Code Generator developed by Javascript
 
 ## Install
 
 ```sh
-npm install q-admin-generator -g
-```
-
-## Run tests
-
-```sh
-npm run test
+npm install -g @q.roy/q-gen
 ```
 
 ## Author

@@ -1,0 +1,17 @@
+import { stringify } from 'qs';
+import request from '@/utils/request';
+ 
+<% requests.forEach(element => { %>
+export async function <%=element.functionName%> (params) {
+  return request({
+    method: '<%=element.method%>',
+    url: '<%=element.url%>',
+    <%_ if (element.params) { _%>
+    params: params,
+    <%_ } _%>
+    <%_ if (element.body) { _%>
+    data: params,
+    <%_ } _%>
+  })
+}
+<% }) %>

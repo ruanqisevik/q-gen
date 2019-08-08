@@ -1,0 +1,36 @@
+import { 
+<%_ requests.forEach(element => { _%>
+	<%- element.functionName %>,
+<%_ }) _%> } from '@/services/<%- moduleName %>'
+
+export default {
+	namespace: '<%- moduleName %>',
+
+	state: {
+		data: {
+			list: [],
+			pagination: {},
+		},
+	},
+
+	effects: {
+		<% requests.forEach(element => { %>
+		*<%- element.action %>({ payload }, { call, put }) {
+			const response = yield call(<%- element.functionName %>, payload)
+			yield put({
+				type: 'save',
+				payload: response,
+			})
+		}, 
+		<% }) %>
+	},
+
+	reducers: {
+		save(state, action) {
+			return {
+				...state,
+				data: action.payload,
+			}
+		},
+	},
+}

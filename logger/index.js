@@ -1,7 +1,3 @@
-const pino = require('pino')
+const signale = require('signale')
 
-module.exports = pino({
-	level: 'warn',
-	base: null,
-	timestamp: false,
-})
+module.exports = signale
