@@ -11,6 +11,30 @@
 npm install -g @q.roy/q-gen
 ```
 
+## Usage
+
+```
+q-gen 0.0.1
+
+USAGE
+
+  q-gen <command> [options]
+
+COMMANDS
+
+  generate
+  umi
+  help <command>      Display help for specific command
+
+GLOBAL OPTIONS
+
+  -h, --help         Display help
+  -V, --version      Display version
+  --no-color         Disable colors
+  --quiet            Quiet mode - only displays warn and error messages
+  -v, --verbose      Verbose mode - will also output debug messages
+```
+
 ## Author
 
 👤 **Q.Roy**
