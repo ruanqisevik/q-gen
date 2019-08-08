@@ -29,7 +29,7 @@ prog
 	})
 
 	// umi generate command
-	.command('umi')
+	.command('umi', '生成内置 umi 代码')
 	.option('-c --config <configFile>', '指定配置文件')
 	.option('-o --output <outputPath>', '指定输出路径')
 	.option('-s --swagger <swaggerFile>', '指定本地 swagger 文件')
