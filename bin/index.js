@@ -6,9 +6,11 @@ const debug = require('../logger')
 const questions = require('./questions')
 const { generate, generateUmi } = require('../generate')
 const { isFileExists } = require('../utils').file
+const version = require('./package.json').version
+
 // general generate command
 prog
-	.version('0.0.2')
+	.version(version)
 	.command('generate')
 	.alias('g')
 	.option('-t --template <template>', '指定模板文件或目录')
