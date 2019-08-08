@@ -8,7 +8,7 @@ const { generate, generateUmi } = require('../generate')
 const { isFileExists } = require('../utils').file
 // general generate command
 prog
-	.version('0.0.1')
+	.version('0.0.2')
 	.command('generate')
 	.alias('g')
 	.option('-t --template <template>', '指定模板文件或目录')
