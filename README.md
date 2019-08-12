@@ -14,7 +14,7 @@ npm install -g @q.roy/q-gen
 ## Usage
 
 ```
-q-gen 0.0.4
+q-gen 0.0.5
 
 USAGE
 

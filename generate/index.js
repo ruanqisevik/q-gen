@@ -6,6 +6,7 @@ const compile = require('./compile')
 const { compileApiWithSwagger, compilePagesWithSwagger } = require('./compileWithSwagger')
 const { writeFileTo, isDirExists } = require('../utils').file
 const ora = require('ora')
+const debug = require('../logger')
 
 const generate = (templatePath, configFile, outputPath, ...infos) => {
 	const templates = getTemplates(templatePath)
@@ -38,6 +39,7 @@ const generateUmi = async (templatePath, configFile, outputPath, config) => {
 			config.listRequest,
 			require(config.swagger)
 		)
+		debug.debug('...........................outputs is: \n', listOutputs)
 
 		listOutputs.forEach(async output => {
 			const spinner = ora('writing output...' + output.filename).start()

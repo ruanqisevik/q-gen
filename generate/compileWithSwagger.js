@@ -4,9 +4,11 @@ const compile = require('./compile')
 const camelcase = require('camelcase')
 const { URL } = require('url')
 const _ = require('lodash')
+const debug = require('../logger')
 
 const compilePagesWithSwagger = (templates, requestInfo, swagger) => {
 	const config = getListConfigFromRequestInfo(requestInfo, swagger)
+	debug.debug('...........................config is: \n', config)
 	return templates.map(template => {
 		let output = {
 			filename: config.fileName + path.extname(template.fileName),
@@ -92,19 +94,21 @@ const getListConfigFromRequestInfo = (requestInfo, swagger) => {
 	const requestUrl = requestInfo.config.url
 	const data = requestInfo.data.data
 	const url = new URL(requestUrl)
-	const requestPath = url.pathname.slice(basePath.length)
+	const requestPath = url.pathname.slice(basePath === '/' ? 0 : basePath.length)
 	const pieces = requestPath.split(sep)
 	const action = pieces.pop()
 	const moduleName = camelcase(pieces.pop())
 	const className = camelcase(moduleName + 'List', { pascalCase: true })
 	const fileName = moduleName + sep + className
 	const functionName = camelcase(action + '-' + moduleName)
+
 	const request = swagger.paths[requestPath]
 	const requestMethod = Object.keys(request)[0]
 	const parameterInfos = request[requestMethod].parameters
 	const headers = []
 	const params = []
 	const body = []
+
 	parameterInfos.map(paramInfo => {
 		if (paramInfo.in === 'header') {
 			headers.push(paramInfo)

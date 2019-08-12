@@ -42,7 +42,6 @@ prog
 		const swagger = options.swagger
 		const moduleNames = options.modules
 		const isValidSwaggerFile = await isFileExists(swagger)
-		console.log(isValidSwaggerFile)
 		const initialAnswer = Object.assign(
 			{
 				builtIn: 'umi',
@@ -51,6 +50,7 @@ prog
 			moduleNames ? { moduleNames: moduleNames.split(',') } : {}
 		)
 		const answers = await questions.askQuestions('umi-start', initialAnswer)
+		debug.debug('...........................answers is : \n', answers)
 		const templateDir = getTemplatePath(answers)
 		await generateUmi(templateDir, configFile, outputPath, answers)
 	})
