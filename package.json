@@ -1,6 +1,6 @@
 {
   "name": "@q.roy/q-gen",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "generator",
   "main": "index.js",
   "homepage": "https://github.com/ruanqisevik/q-gen",
